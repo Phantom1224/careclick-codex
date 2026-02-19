@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CareClick - Messenger</title>
+    <link rel="stylesheet" href="Profile.css">
+</head>
+<body>
+
+    <div class="brand-header" id="brand-header">
+        <h1 class="logo">Care<span>Click</span></h1>
+    </div>
+
+    <div id="view-profile">
+        <header>
+            <div style="width: 30px;"></div> 
+            <span class="page-title">Profile</span>
+            <img src="Pencil.png" alt="Edit" style="width: 20px; height: 20px;">
+            </button>
+        </header>
+
+        <main class="content-container profile-center">
+            <div class="avatar-wrapper">
+                <img src="Profile 2.png" alt="Profile Avatar" style="width: 60px; height: 60px;">
+            </div>
+            <div class="profile-details">
+                <h2 style="margin: 10px 0 5px 0; font-size: 1.6rem;">Peter Parker</h2>
+                <p class="profile-meta">@spiderman</p>
+                <p class="profile-meta">spiderman@email.com</p>
+                <p class="profile-meta">+1 (555) 123-4567</p>
+            </div>
+
+            <div class="info-card">
+                <div class="icon-box purple-bg">
+                    <img src="Gender.png" alt="Gender" style="width: 24px; height: 24px;">
+                </div>
+                <div style="flex:1;">
+                    <p class="info-label">Gender</p>
+                    <p class="info-value">Male</p>
+                </div>
+            </div>
+
+            <div class="info-card" onclick="openMessenger()">
+                <div class="icon-box green-bg">
+                <img src="Message.png" alt="Messenger" style="width: 24px; height: 24px;">
+                </div>
+                    <p class="info-value">Messenger</p>
+                </div>
+                <div class="chevron">›</div>
+            </div>
+        </main>
+    </div>
+
+    <div id="view-messenger" class="hidden">
+        <header>
+            <button class="icon-btn" onclick="openProfile()">←</button>
+            <span class="page-title">Messenger</span>
+            <button class="icon-btn">
+                <img src="Search.png" alt="Search" style="width: 20px; height: 20px;">
+            </button>
+        </header>
+
+        <main class="content-container">
+            <h2 class="msg-section-title">Messages</h2>
+            <div class="message-row" onclick="openChat('Peter Parker')">
+                <div class="msg-avatar avatar-lime">👤</div>
+                <div class="msg-body">
+                    <div class="msg-header">
+                        <span class="msg-name">Peter Parker</span>
+                        <span class="msg-time">10:30 AM</span>
+                    </div>
+                    <p class="msg-text">Hey! How are you doing today?</p>
+                </div>
+            </div>
+
+            <div class="message-row" onclick="openChat('Support Team')">
+                <div class="msg-avatar avatar-purple">👤</div>
+                <div class="msg-body">
+                    <div class="msg-header">
+                        <span class="msg-name">Support Team</span>
+                        <span class="msg-time">2 days ago</span>
+                    </div>
+                    <p class="msg-text">Thank you for contacting CareClick supp...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="view-chat" class="hidden">
+        <header>
+            <button class="icon-btn" onclick="openMessenger()">←</button>
+            <div style="text-align: center; flex: 1;">
+                <div class="page-title" id="chat-title">User Name</div>
+                <div class="active-status">Active now</div>
+            </div>
+            <div class="chat-header-actions">
+                <span onclick="startCall()" class="call-trigger">
+                    <img src="telephone-call_6204929.png" alt="Call" style="width: 20px; height: 20px;">
+                <span class="more-trigger">
+                     <img src="menu_18094589.png" alt="More" style="width: 20px; height: 20px;">
+                </span>
+            </div>
+        </header>
+        <main class="content-container chat-container">
+            <div class="chat-bubble bubble-received">
+                Hey! How are you doing today?
+                <span class="chat-meta">10:24 AM</span>
+            </div>
+            <div class="chat-bubble bubble-sent">
+                I'm doing great, thanks for asking!
+                <span class="chat-meta">10:26 AM</span>
+            </div>
+            <div class="chat-bubble bubble-received">
+                Perfect! I'll send you the agenda in a bit.
+                <span class="chat-meta">10:27 AM</span>
+            </div>
+        </main>
+
+        <footer class="chat-footer">
+            <span class="footer-icon">
+                 <img src="Add file.png" alt="Add" style="width: 15px; height: 15px;">
+            </span>
+            <span class="footer-icon">
+                <img src="Add image.png" alt="Camera" style="width: 15px; height: 15px;">
+            </span>
+            <input type="text" class="chat-input" placeholder="Type a message...">
+            <button class="send-icon-btn">➤</button>
+        </footer>
+    </div>
+
+    <div id="view-call" class="hidden">
+        <div class="call-page-branding">
+            <h1 class="logo">Care<span>Click</span></h1>
+        </div>
+
+        <div class="call-header">
+            <div class="call-header-btn" onclick="endCall()">←</div>
+            <div class="page-title" id="call-name">Peter Parker</div>
+            <div class="call-header-btn transparent">⋮</div>
+        </div>
+
+        <div class="call-avatar-container">
+            <div class="call-avatar-glow">
+               <img src="images (7).jpg" class="call-avatar-img" alt="User">
+            </div>
+            <div class="call-status-info">
+                <div class="call-timer">
+                    <div class="timer-dot"></div>
+                    <span>00:24</span>
+                </div>
+                <div class="call-status-label">Connected</div>
+               <img src="Signal.png" alt="Signal" style="width: 16px; height: 16px;">
+                    <span>Excellent connection</span>
+            </div>
+        </div>
+
+        <div class="call-action-card">
+            <div class="call-buttons-row">
+                <div class="call-btn-item">
+                    <div class="call-icon-circle">
+                    <img src="Mic.png" alt="Mute" style="width: 24px; height: 24px;">
+                    </div>
+                    <span>Mute</span>
+                </div>
+                <div class="call-btn-item">
+                    <div class="call-icon-circle active">
+                        <img src="Speaker.png" alt="Speaker" style="width: 24px; height: 24px;">
+                    </div>
+                    <span style="color: var(--primary-green)">Speaker</span>
+                </div>
+                <div class="call-btn-item">
+                    <div class="call-icon-circle">
+                    <img src="Message 2.png" alt="Message" style="width: 24px; height: 24px;">
+                    </div>
+                    <span>Message</span>
+                </div>
+            </div>
+            <button class="btn-end-call" onclick="endCall()">
+                <span class="phone-icon-rotated">📞</span> End Call
+            </button>
+        </div>
+    </div>
+
+    <nav class="bottom-nav" id="main-nav">
+        <div class="nav-item green-active">
+            <img src="Home.png" alt="Home" style="width: 24px; height: 24px;">
+        </div>
+        <div class="nav-item active" onclick="openProfile()">
+            <img src="Profile.png" alt="Profile" style="width: 45px; height: 45px;">
+        </div>
+        <div class="nav-item">☰</div>
+    </nav>
+
+    <script src="Profile.js"></script>
+</body>
+</html>
