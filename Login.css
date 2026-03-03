@@ -63,11 +63,11 @@ h2 { font-size: 1.5rem; margin-bottom: 0.5rem; }
 
 .form-group { text-align: left; margin-bottom: 1rem; }
 
-label { 
-    display: block; 
-    font-size: 0.85rem; 
-    font-weight: 600; 
-    margin-bottom: 0.5rem; 
+label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
     padding-left: 4px;
 }
 
@@ -116,7 +116,8 @@ input:focus { border-color: var(--primary-green); }
     margin: 0 auto 1.5rem;
     font-size: 1.5rem;
 }
-.hidden { display: none; }
+
+.hidden { display: none !important; }
 
 .form-message {
     font-size: 0.85rem;
@@ -127,6 +128,34 @@ input:focus { border-color: var(--primary-green); }
 
 .form-message.error {
     color: #dc2626;
+}
+
+.otp-container {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 1rem;
+}
+
+.otp-input {
+    width: 42px;
+    height: 52px;
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 700;
+    border: 2px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 0;
+}
+
+.otp-input:focus {
+    border-color: var(--primary-green);
+}
+
+.resend-text {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 2rem;
 }
 
 @media (max-height: 700px) {
