@@ -11,6 +11,8 @@ let lastLocationSyncAt = 0;
 let activeMarkers = [];
 let customUserMarkerIconAvailable = null;
 let customUserMarkerIconCheckPromise = null;
+let userMarkerReadyPromise = null;
+let latestMarkerUpdateId = 0;
 
 if (!token) {
     window.location.href = "Login.html";
@@ -147,17 +149,39 @@ async function createUserMarker(coords) {
     return createDefaultUserMarker(coords);
 }
 
+async function ensureUserMarker(coords) {
+    if (userMarker) {
+        return userMarker;
+    }
+
+    if (!userMarkerReadyPromise) {
+        userMarkerReadyPromise = createUserMarker(coords)
+            .then((marker) => {
+                userMarker = marker;
+                return marker;
+            })
+            .finally(() => {
+                userMarkerReadyPromise = null;
+            });
+    }
+
+    return userMarkerReadyPromise;
+}
+
 async function updateMapLocation(lat, lng) {
     if (!map) return;
 
     const coords = [lat, lng];
+    const currentUpdateId = ++latestMarkerUpdateId;
+    const marker = await ensureUserMarker(coords);
 
-    if (!userMarker) {
-        userMarker = await createUserMarker(coords);
-    } else {
-        if (typeof userMarker.setLatLng === "function") {
-            userMarker.setLatLng(coords);
-        }
+    // Ignore stale async completions and apply only the newest position.
+    if (currentUpdateId !== latestMarkerUpdateId) {
+        return;
+    }
+
+    if (typeof marker.setLatLng === "function") {
+        marker.setLatLng(coords);
     }
 
     map.panTo(coords, { animate: true, duration: 0.7 });
@@ -199,7 +223,7 @@ function startLocationTracking() {
 
     locationWatchId = navigator.geolocation.watchPosition(handlePosition, handlePositionError, {
         enableHighAccuracy: true,
-        maximumAge: 10000,
+        maximumAge: 1000,
         timeout: 15000,
     });
 }
