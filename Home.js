@@ -320,12 +320,12 @@ function requestHelp() {
     hideElement("sos-btn");
     showElement("request-panel");
 
-    setTimeout(() => {
+    /*setTimeout(() => {
         const panel = document.getElementById("request-panel");
         if (!panel.classList.contains("hidden")) {
             showLocation();
         }
-    }, 2000);
+    }, 2000);*/
 }
 
 function showLocation() {
@@ -374,9 +374,9 @@ function resetHome() {
     activeMarkers.forEach((m) => m.remove());
     activeMarkers = [];
 
-    setTimeout(() => {
+    /*setTimeout(() => {
         receiveIncomingRequest();
-    }, 3000);
+    }, 3000);*/
 }
 
 function hideElement(id) {

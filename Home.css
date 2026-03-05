@@ -183,7 +183,9 @@ body {
     display: flex; justify-content: space-around; align-items: center;
     padding: 10px 0 25px 0; border-top: 1px solid #f1f5f9; z-index: 60;
 }
-.nav-item { font-size: 1.5rem; color: var(--text-muted); padding: 10px; cursor: pointer; }
+.nav-item { font-size: 1.5rem; color: var(--text-muted); padding: 10px; }
+
+.nav-others { font-size: 1.5rem; color: var(--text-muted); padding: 10px; cursor: pointer; }
 
 .home-active-btn { 
     background: var(--primary-blue); color: var(--icon-blue); border-radius: 50%; 
@@ -193,5 +195,11 @@ body {
 .home-active-btn img, .nav-item img {
     width: 24px;  /* Adjust this to match the size of the icons */
     height: 24px;
+    object-fit: contain;
+}
+
+.nav-others img {
+    width: 45px;
+    height: 45px;
     object-fit: contain;
 }

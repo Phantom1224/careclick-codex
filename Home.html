@@ -20,18 +20,18 @@
                 <h1 class="logo">Care<span>Click</span></h1>
                 <p id="live-location" class="live-location">Locating...</p>
             </div>
-            <img src="Search.png" alt="Avatar" class="icon">
+            <img src="Icon/Search.png" alt="Avatar" class="icon">
         </div>
 
         <div id="map"></div>
 
         <div class="sos-button" id="sos-btn" onclick="requestHelp()">
-            <img src="Hand.png" alt="Avatar" class="icon">
+            <img src="Icon/Hand.png" alt="Avatar" class="icon">
         </div>
 
         <div id="incoming-modal" class="request-card hidden">
             <div class="profile-avatar">
-                <img src="Profile Circle.png" alt="Avatar" class="icon">
+                <img src="Icon/Profile Circle.png" alt="Avatar" class="icon">
             </div>
             <h2>is requesting help</h2>
             <div class="modal-btn-group">
@@ -56,10 +56,14 @@
 
     <nav class="bottom-nav">
         <div class="nav-item" onclick="resetHome()">
-            <img src="Home.png" alt="Avatar" class="icon">
+            <img src="Icon/Home.png" alt="Home" class="icon">
         </div>
-        <img src="Profile.png" alt="Avatar" class="icon">
-        <div class="nav-item" onclick="window.location.href='Menu.html'">&#9776;</div>
+
+        <div class="nav-others" onclick="window.location.href='Profile.html'">
+            <img src="Icon/Profile.png" alt="Profile" class="icon">
+        </div>
+
+        <div class="nav-others" onclick="window.location.href='Menu.html'">&#9776;</div>
     </nav>
 
     <script
