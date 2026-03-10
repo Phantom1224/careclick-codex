@@ -1,6 +1,6 @@
 const API_BASE = window.location.origin;
 const TOKEN_KEY = "careclickToken";
-const LOCATION_SYNC_MS = 2000;
+const LOCATION_SYNC_MS = 5000;
 const USER_MARKER_ICON_URL = "Icon/gps.png";
 const FEED_REFRESH_MS = LOCATION_SYNC_MS;
 
@@ -245,7 +245,7 @@ function startLocationTracking() {
 
     locationWatchId = navigator.geolocation.watchPosition(handlePosition, handlePositionError, {
         enableHighAccuracy: true,
-        maximumAge: 1000,
+        maximumAge: 3000,
         timeout: 15000,
     });
 }
@@ -273,7 +273,7 @@ function syncOtherUserMarkers(users) {
         const isOtherUser = String(user._id) !== String(currentUserId);
         const hasCoords =
             Number.isFinite(user?.userLocation?.lat) && Number.isFinite(user?.userLocation?.lng);
-        return isOtherUser && user.isOnline && hasCoords;
+        return isOtherUser && user.isOnline && hasCoords && user.isRequesting;
     });
 
     const activeIds = new Set(onlineOtherUsers.map((user) => String(user._id)));
@@ -326,23 +326,16 @@ function requestHelp() {
             showLocation();
         }
     }, 2000);*/
+
+    setTimeout(() => {
+        showLocation();
+    }, 2000);
 }
 
 function showLocation() {
     hideElement("request-panel");
     showElement("location-panel");
-
-    const locations = [[120.962, 15.482], [120.958, 15.478]];
-    locations.forEach((coord) => {
-        const marker = L.circleMarker([coord[1], coord[0]], {
-            radius: 7,
-            color: "#82d14d",
-            weight: 2,
-            fillColor: "#82d14d",
-            fillOpacity: 0.9,
-        }).addTo(map);
-        activeMarkers.push(marker);
-    });
+    setRequestingStatus(true);
 }
 
 function cancelRequest() {
@@ -370,6 +363,7 @@ function resetHome() {
     hideElement("location-panel");
     hideElement("incoming-modal");
     showElement("sos-btn");
+    setRequestingStatus(false);
 
     activeMarkers.forEach((m) => m.remove());
     activeMarkers = [];
@@ -377,6 +371,17 @@ function resetHome() {
     /*setTimeout(() => {
         receiveIncomingRequest();
     }, 3000);*/
+}
+
+async function setRequestingStatus(isRequesting) {
+    try {
+        await apiRequest("/api/users/me/requesting", {
+            method: "PATCH",
+            body: JSON.stringify({ isRequesting }),
+        });
+    } catch (error) {
+        console.error("Request status update failed:", error.message);
+    }
 }
 
 function hideElement(id) {
