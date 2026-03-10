@@ -51,6 +51,25 @@ router.patch("/me/location", requireAuth, async (req, res) => {
   }
 });
 
+router.patch("/me/requesting", requireAuth, async (req, res) => {
+  try {
+    const isRequesting = Boolean(req.body.isRequesting);
+
+    const user = await User.findByIdAndUpdate(
+      req.auth.userId,
+      { isRequesting, lastSeenAt: new Date() },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    return res.json({ isRequesting: user.isRequesting });
+  } catch (_error) {
+    return res.status(500).json({ message: "Unable to update request status" });
+  }
+});
+
 router.get("/location-feed", requireAuth, async (req, res) => {
   try {
     const now = new Date();
@@ -58,7 +77,7 @@ router.get("/location-feed", requireAuth, async (req, res) => {
 
     const users = await User.find(
       {},
-      { userName: 1, emailAddress: 1, role: 1, userLocation: 1, lastSeenAt: 1 }
+      { userName: 1, emailAddress: 1, role: 1, userLocation: 1, isRequesting: 1, lastSeenAt: 1 }
     ).lean();
 
     const locationFeed = users.map((user) => {
@@ -72,6 +91,7 @@ router.get("/location-feed", requireAuth, async (req, res) => {
         emailAddress: user.emailAddress,
         role: user.role,
         userLocation: user.userLocation || null,
+        isRequesting: Boolean(user.isRequesting),
         lastSeenAt: user.lastSeenAt || null,
         isOnline,
       };

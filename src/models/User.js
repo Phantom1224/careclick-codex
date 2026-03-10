@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema(
       lng: Number,
       updatedAt: Date,
     },
+    isRequesting: {
+      type: Boolean,
+      default: false,
+    },
     lastSeenAt: {
       type: Date,
       default: null,
