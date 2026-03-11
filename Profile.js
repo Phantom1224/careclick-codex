@@ -1,7 +1,7 @@
 /**
  * Navigation: Opens the main Messenger list
  */
-function openMessenger() {
+function openMessages() {
     hideAllViews();
     showElement('view-messenger');
     showElement('main-nav');

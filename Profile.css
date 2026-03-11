@@ -151,3 +151,8 @@ header {
 .nav-item { font-size: 1.5rem; color: var(--text-muted); cursor: pointer; }
 .nav-item.active { color: var(--primary-blue); background: #eff6ff; width: 50px; height: 50px; display: flex; justify-content: center; align-items: center; border-radius: 50%; }
 .nav-item.green-active { color: var(--primary-green); }
+
+.view-profile {
+    display: flex;
+    align-items: center;
+}

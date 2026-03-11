@@ -16,36 +16,24 @@
         <header>
             <div style="width: 30px;"></div> 
             <span class="page-title">Profile</span>
-            <img src="Pencil.png" alt="Edit" style="width: 20px; height: 20px;">
+            <img src="Icon/Pencil.png" alt="Edit" style="width: 20px; height: 20px;">
             </button>
         </header>
 
         <main class="content-container profile-center">
             <div class="avatar-wrapper">
-                <img src="Profile 2.png" alt="Profile Avatar" style="width: 60px; height: 60px;">
+                <img src="Icon/Profile 2.png" alt="Profile Avatar" style="width: 60px; height: 60px;">
             </div>
             <div class="profile-details">
-                <h2 style="margin: 10px 0 5px 0; font-size: 1.6rem;">Peter Parker</h2>
-                <p class="profile-meta">@spiderman</p>
-                <p class="profile-meta">spiderman@email.com</p>
-                <p class="profile-meta">+1 (555) 123-4567</p>
+                <h2 style="margin: 10px 0 5px 0; font-size: 1.6rem;">username</h2>
+                <p class="profile-meta">user@email</p>
             </div>
 
-            <div class="info-card">
-                <div class="icon-box purple-bg">
-                    <img src="Gender.png" alt="Gender" style="width: 24px; height: 24px;">
-                </div>
-                <div style="flex:1;">
-                    <p class="info-label">Gender</p>
-                    <p class="info-value">Male</p>
-                </div>
-            </div>
-
-            <div class="info-card" onclick="openMessenger()">
+            <div class="info-card" onclick="openMessages()">
                 <div class="icon-box green-bg">
-                <img src="Message.png" alt="Messenger" style="width: 24px; height: 24px;">
+                <img src="Icon/Message.png" alt="Messages" style="width: 24px; height: 24px;">
                 </div>
-                    <p class="info-value">Messenger</p>
+                    <p class="info-value">Messages</p>
                 </div>
                 <div class="chevron">›</div>
             </div>
@@ -55,7 +43,7 @@
     <div id="view-messenger" class="hidden">
         <header>
             <button class="icon-btn" onclick="openProfile()">←</button>
-            <span class="page-title">Messenger</span>
+            <span class="page-title">Messages</span>
             <button class="icon-btn">
                 <img src="Search.png" alt="Search" style="width: 20px; height: 20px;">
             </button>
@@ -63,18 +51,18 @@
 
         <main class="content-container">
             <h2 class="msg-section-title">Messages</h2>
-            <div class="message-row" onclick="openChat('Peter Parker')">
+            <div class="message-row" onclick="openChat('User 2')">
                 <div class="msg-avatar avatar-lime">👤</div>
                 <div class="msg-body">
                     <div class="msg-header">
-                        <span class="msg-name">Peter Parker</span>
+                        <span class="msg-name">User 2</span>
                         <span class="msg-time">10:30 AM</span>
                     </div>
                     <p class="msg-text">Hey! How are you doing today?</p>
                 </div>
             </div>
 
-            <div class="message-row" onclick="openChat('Support Team')">
+            <!--<div class="message-row" onclick="openChat('Support Team')">
                 <div class="msg-avatar avatar-purple">👤</div>
                 <div class="msg-body">
                     <div class="msg-header">
@@ -83,13 +71,13 @@
                     </div>
                     <p class="msg-text">Thank you for contacting CareClick supp...</p>
                 </div>
-            </div>
+            </div>-->
         </main>
     </div>
 
     <div id="view-chat" class="hidden">
         <header>
-            <button class="icon-btn" onclick="openMessenger()">←</button>
+            <button class="icon-btn" onclick="openMessages()">←</button>
             <div style="text-align: center; flex: 1;">
                 <div class="page-title" id="chat-title">User Name</div>
                 <div class="active-status">Active now</div>
@@ -104,25 +92,18 @@
         </header>
         <main class="content-container chat-container">
             <div class="chat-bubble bubble-received">
-                Hey! How are you doing today?
+                User 2 message
                 <span class="chat-meta">10:24 AM</span>
             </div>
             <div class="chat-bubble bubble-sent">
-                I'm doing great, thanks for asking!
+                User 1 message
                 <span class="chat-meta">10:26 AM</span>
-            </div>
-            <div class="chat-bubble bubble-received">
-                Perfect! I'll send you the agenda in a bit.
-                <span class="chat-meta">10:27 AM</span>
             </div>
         </main>
 
         <footer class="chat-footer">
             <span class="footer-icon">
-                 <img src="Add file.png" alt="Add" style="width: 15px; height: 15px;">
-            </span>
-            <span class="footer-icon">
-                <img src="Add image.png" alt="Camera" style="width: 15px; height: 15px;">
+                <img src="Icon/Add image.png" alt="Camera" style="width: 15px; height: 15px;">
             </span>
             <input type="text" class="chat-input" placeholder="Type a message...">
             <button class="send-icon-btn">➤</button>
@@ -184,12 +165,12 @@
 
     <nav class="bottom-nav" id="main-nav">
         <div class="nav-item green-active">
-            <img src="Home.png" alt="Home" style="width: 24px; height: 24px;">
+            <img src="Icon/Home.png" alt="Home" style="width: 24px; height: 24px;" onclick="window.location.href='Home.html'" cursor="pointer">
         </div>
         <div class="nav-item active" onclick="openProfile()">
-            <img src="Profile.png" alt="Profile" style="width: 45px; height: 45px;">
+            <img src="Icon/Profile.png" alt="Profile" style="width: 45px; height: 45px;">
         </div>
-        <div class="nav-item">☰</div>
+        <div class="nav-item" onclick="window.location.href='Menu.html'" curssor="pointer">☰</div>
     </nav>
 
     <script src="Profile.js"></script>

@@ -162,7 +162,7 @@ body {
 /* Status Panels */
 .bottom-panel {
     position: absolute; bottom: 85px; width: 100%;
-    background: white; padding: 20px; border-radius: 30px 30px 0 0;
+    background: white; padding: 20px 20px 40px; border-radius: 30px 30px 0 0;
     display: flex; flex-direction: column; align-items: center;
     box-shadow: 0 -10px 25px rgba(0,0,0,0.1); z-index: 55;
     animation: slideUp 0.3s ease-out;
@@ -171,7 +171,12 @@ body {
 
 .panel-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 15px; }
 .no-margin { margin: 0; }
-.location-header { display:flex; align-items:center; justify-content:space-between; width:100%; }
+.location-header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    width:100%;
+}
 
 .btn-action { border: none; padding: 12px 40px; border-radius: 12px; font-size: 1.1rem; font-weight: 800; cursor: pointer; min-width: 150px; }
 .btn-cancel { background: var(--end-call-red); color: white; }
