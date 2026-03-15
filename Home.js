@@ -17,6 +17,7 @@ let latestMarkerUpdateId = 0;
 let currentUserId = null;
 let feedRefreshTimerId = null;
 const otherUserMarkers = new Map();
+let isRequestingActive = false;
 
 if (!token) {
     window.location.href = "Login.html";
@@ -250,10 +251,27 @@ function startLocationTracking() {
     });
 }
 
+function applyRequestingUI(isRequesting) {
+    isRequestingActive = Boolean(isRequesting);
+
+    if (isRequestingActive) {
+        hideElement("sos-btn");
+        hideElement("request-panel");
+        hideElement("incoming-modal");
+        showElement("location-panel");
+    } else {
+        hideElement("request-panel");
+        hideElement("location-panel");
+        hideElement("incoming-modal");
+        showElement("sos-btn");
+    }
+}
+
 async function loadCurrentUser() {
     try {
         const data = await apiRequest("/api/users/me");
         currentUserId = data?.user?._id || null;
+        applyRequestingUI(data?.user?.isRequesting);
         const userLocation = data?.user?.userLocation;
         if (Number.isFinite(userLocation?.lat) && Number.isFinite(userLocation?.lng)) {
             setLocationLabel(`Last known: ${formatCoordinates(userLocation.lat, userLocation.lng)}`);
@@ -336,6 +354,7 @@ function showLocation() {
     hideElement("request-panel");
     showElement("location-panel");
     setRequestingStatus(true);
+    isRequestingActive = true;
 }
 
 function cancelRequest() {
@@ -364,6 +383,7 @@ function resetHome() {
     hideElement("incoming-modal");
     showElement("sos-btn");
     setRequestingStatus(false);
+    isRequestingActive = false;
 
     activeMarkers.forEach((m) => m.remove());
     activeMarkers = [];
@@ -379,6 +399,7 @@ async function setRequestingStatus(isRequesting) {
             method: "PATCH",
             body: JSON.stringify({ isRequesting }),
         });
+        isRequestingActive = Boolean(isRequesting);
     } catch (error) {
         console.error("Request status update failed:", error.message);
     }
