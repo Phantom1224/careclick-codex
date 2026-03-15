@@ -11,6 +11,7 @@ const OTP_LENGTH = 6;
 const OTP_RESEND_COOLDOWN_MS = 60 * 1000;
 const DEFAULT_OTP_EXP_MINUTES = 10;
 const pendingSignups = new Map();
+const pendingPasswordResets = new Map();
 let mailTransporter = null;
 
 function buildToken(user) {
@@ -65,6 +66,17 @@ async function sendOtpEmail(toEmail, code) {
     subject: "Your CareClick Verification Code",
     text: `Your CareClick verification code is ${code}. It expires in ${Number(process.env.OTP_EXPIRES_MINUTES) || DEFAULT_OTP_EXP_MINUTES} minutes.`,
     html: `<p>Your CareClick verification code is <strong>${code}</strong>.</p><p>It expires in ${Number(process.env.OTP_EXPIRES_MINUTES) || DEFAULT_OTP_EXP_MINUTES} minutes.</p>`,
+  });
+}
+
+async function sendPasswordResetEmail(toEmail, code) {
+  const transporter = getTransporter();
+  await transporter.sendMail({
+    from: process.env.GMAIL_USER,
+    to: toEmail,
+    subject: "Your CareClick Password Reset Code",
+    text: `Your CareClick password reset code is ${code}. It expires in ${Number(process.env.OTP_EXPIRES_MINUTES) || DEFAULT_OTP_EXP_MINUTES} minutes.`,
+    html: `<p>Your CareClick password reset code is <strong>${code}</strong>.</p><p>It expires in ${Number(process.env.OTP_EXPIRES_MINUTES) || DEFAULT_OTP_EXP_MINUTES} minutes.</p>`,
   });
 }
 
@@ -222,6 +234,125 @@ router.post("/signup/verify-code", async (req, res) => {
     }
 
     return res.status(500).json({ message: "Unable to verify signup code" });
+  }
+});
+
+router.post("/password/request-code", async (req, res) => {
+  try {
+    const normalizedEmail = cleanEmail(req.body.emailAddress);
+    if (!normalizedEmail) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const user = await User.findOne({ emailAddress: normalizedEmail });
+    if (!user) {
+      return res.status(404).json({ message: "No account found for that email" });
+    }
+
+    const existing = pendingPasswordResets.get(normalizedEmail);
+    const now = Date.now();
+    if (existing && now < existing.resendAvailableAt) {
+      const waitSeconds = Math.ceil((existing.resendAvailableAt - now) / 1000);
+      return res.status(429).json({ message: `Please wait ${waitSeconds}s before requesting another code` });
+    }
+
+    const code = generateOtpCode();
+    pendingPasswordResets.set(normalizedEmail, {
+      userId: user._id.toString(),
+      emailAddress: normalizedEmail,
+      codeHash: hashOtp(code),
+      expiresAt: now + otpExpiresMs(),
+      resendAvailableAt: now + OTP_RESEND_COOLDOWN_MS,
+    });
+
+    await sendPasswordResetEmail(normalizedEmail, code);
+    return res.json({ message: "Password reset code sent to email" });
+  } catch (_error) {
+    return res.status(500).json({ message: "Unable to send password reset code" });
+  }
+});
+
+router.post("/password/resend-code", async (req, res) => {
+  try {
+    const normalizedEmail = cleanEmail(req.body.emailAddress);
+    if (!normalizedEmail) {
+      return res.status(400).json({ message: "Email is required" });
+    }
+
+    const pending = pendingPasswordResets.get(normalizedEmail);
+    if (!pending) {
+      return res.status(404).json({ message: "No pending reset found for this email" });
+    }
+
+    const now = Date.now();
+    if (now < pending.resendAvailableAt) {
+      const waitSeconds = Math.ceil((pending.resendAvailableAt - now) / 1000);
+      return res.status(429).json({ message: `Please wait ${waitSeconds}s before resending` });
+    }
+
+    const code = generateOtpCode();
+    pending.codeHash = hashOtp(code);
+    pending.expiresAt = now + otpExpiresMs();
+    pending.resendAvailableAt = now + OTP_RESEND_COOLDOWN_MS;
+    pendingPasswordResets.set(normalizedEmail, pending);
+
+    await sendPasswordResetEmail(normalizedEmail, code);
+    return res.json({ message: "Password reset code resent" });
+  } catch (_error) {
+    return res.status(500).json({ message: "Unable to resend password reset code" });
+  }
+});
+
+router.post("/password/reset", async (req, res) => {
+  try {
+    const normalizedEmail = cleanEmail(req.body.emailAddress);
+    const code = String(req.body.code || "").trim();
+    const newPassword = String(req.body.newPassword || "");
+    const confirmPassword = String(req.body.confirmPassword || "");
+
+    if (!normalizedEmail || !code || !newPassword || !confirmPassword) {
+      return res.status(400).json({ message: "All required fields must be provided" });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ message: "Passwords do not match" });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({ message: "Password must be at least 8 characters long" });
+    }
+
+    if (!/^\d{6}$/.test(code)) {
+      return res.status(400).json({ message: "Verification code must be a 6-digit number" });
+    }
+
+    const pending = pendingPasswordResets.get(normalizedEmail);
+    if (!pending) {
+      return res.status(404).json({ message: "No pending reset found for this email" });
+    }
+
+    if (Date.now() > pending.expiresAt) {
+      pendingPasswordResets.delete(normalizedEmail);
+      return res.status(400).json({ message: "Verification code has expired. Request a new code." });
+    }
+
+    if (hashOtp(code) !== pending.codeHash) {
+      return res.status(400).json({ message: "Invalid verification code" });
+    }
+
+    const user = await User.findOne({ emailAddress: normalizedEmail });
+    if (!user) {
+      pendingPasswordResets.delete(normalizedEmail);
+      return res.status(404).json({ message: "No account found for that email" });
+    }
+
+    user.passwordHash = await bcrypt.hash(newPassword, 10);
+    await user.save();
+
+    pendingPasswordResets.delete(normalizedEmail);
+    return res.json({ message: "Password updated successfully" });
+  } catch (_error) {
+    return res.status(500).json({ message: "Unable to reset password" });
   }
 });
 
