@@ -1,6 +1,71 @@
 /**
  * Navigation: Opens the main Messenger list
  */
+const API_BASE = window.location.origin;
+const TOKEN_KEY = "careclickToken";
+const token = localStorage.getItem(TOKEN_KEY);
+
+if (!token) {
+    window.location.href = "Login.html";
+}
+
+function authHeaders() {
+    return {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+    };
+}
+
+async function apiRequest(path, options = {}) {
+    const response = await fetch(`${API_BASE}${path}`, {
+        ...options,
+        headers: {
+            ...(options.headers || {}),
+            ...authHeaders(),
+        },
+    });
+
+    let data = {};
+    try {
+        data = await response.json();
+    } catch (_error) {
+        data = {};
+    }
+
+    if (response.status === 401) {
+        localStorage.removeItem(TOKEN_KEY);
+        window.location.href = "Login.html";
+        throw new Error("Session expired");
+    }
+
+    if (!response.ok) {
+        throw new Error(data.message || "Request failed");
+    }
+
+    return data;
+}
+
+function setProfileDetails(user) {
+    const nameEl = document.getElementById("profile-username");
+    const emailEl = document.getElementById("profile-email");
+
+    if (nameEl) {
+        nameEl.textContent = user?.userName || "Unknown user";
+    }
+
+    if (emailEl) {
+        emailEl.textContent = user?.emailAddress || "No email on file";
+    }
+}
+
+async function loadProfile() {
+    try {
+        const data = await apiRequest("/api/users/me");
+        setProfileDetails(data?.user);
+    } catch (error) {
+        console.error("Failed to load profile:", error.message);
+    }
+}
 function openMessages() {
     hideAllViews();
     showElement('view-messenger');
@@ -73,3 +138,7 @@ function showElement(id) {
     const el = document.getElementById(id);
     if (el) el.classList.remove('hidden');
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadProfile();
+});
