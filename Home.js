@@ -145,12 +145,13 @@ function createDefaultUserMarker(coords) {
         weight: 2,
         fillColor: "#3b82f6",
         fillOpacity: 0.9,
+        interactive: false,
     }).addTo(map);
 }
 
 function createOtherUserMarker(coords) {
     return L.circleMarker(coords, {
-        radius: 6,
+        radius: 8,
         color: "#890c0c",
         weight: 2,
         fillColor: "#f90909",
@@ -170,7 +171,7 @@ async function createUserMarker(coords) {
             popupAnchor: [0, -36],
         });
 
-        return L.marker(coords, { icon: userIcon }).addTo(map);
+        return L.marker(coords, { icon: userIcon, interactive: false }).addTo(map);
     }
 
     return createDefaultUserMarker(coords);
