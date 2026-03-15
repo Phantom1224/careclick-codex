@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CareClick - Messenger</title>
+    <title>CareClick - Profile</title>
     <link rel="stylesheet" href="Profile.css">
 </head>
 <body>
@@ -44,16 +44,18 @@
         <header>
             <button class="icon-btn" onclick="openProfile()">←</button>
             <span class="page-title">Messages</span>
-            <button class="icon-btn">
-                <img src="Search.png" alt="Search" style="width: 20px; height: 20px;">
+            <button class="icon-btn" id="search-toggle-btn" onclick="toggleUserSearch()">
+                <img src="Icon/Search.png" alt="Search" style="width: 20px; height: 20px;">
             </button>
         </header>
 
         <main class="content-container">
             <h2 class="msg-section-title">Messages</h2>
+            <div class="search-row hidden" id="user-search-row">
+                <input type="text" id="user-search-input" class="search-input" placeholder="Search users...">
+            </div>
             <div id="messages-empty" class="msg-empty hidden">No conversations yet.</div>
             <div id="messages-list"></div>
-            <h3 class="msg-section-subtitle">Start a new chat</h3>
             <div id="users-empty" class="msg-empty hidden">No other users found.</div>
             <div id="users-list"></div>
         </main>

@@ -1,6 +1,7 @@
 const API_BASE = window.location.origin;
 let countdownInterval = null;
 let pendingSignupEmail = "";
+let pendingForgotEmail = "";
 const OTP_RESEND_SECONDS = 60;
 
 function toggleView(viewId) {
@@ -112,6 +113,11 @@ async function handleSignup(event) {
         return;
     }
 
+    if (password.length < 8) {
+        setMessage("signup-message", "Password must be at least 8 characters long.", true);
+        return;
+    }
+
     try {
         await requestJson("/api/auth/signup/request-code", {
             userName,
@@ -125,32 +131,35 @@ async function handleSignup(event) {
         clearOtpInputs();
         toggleView("view-verify");
         setMessage("verify-message", "Verification code sent. Check your email.");
-        startResendTimer();
+        startResendTimer("signup-resend-btn", "signup-timer-display");
     } catch (error) {
         setMessage("signup-message", error.message, true);
     }
 }
 
-function updateTimerDisplay(seconds) {
-    const timerDisplay = document.getElementById("timer-display");
+function updateTimerDisplay(timerDisplay, seconds) {
     const m = Math.floor(seconds / 60);
     const s = seconds % 60;
     timerDisplay.textContent = `(Resend in ${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")})`;
 }
 
-function startResendTimer() {
-    const resendBtn = document.getElementById("resend-btn");
-    const timerDisplay = document.getElementById("timer-display");
+function startResendTimer(resendBtnId, timerDisplayId) {
+    const resendBtn = document.getElementById(resendBtnId);
+    const timerDisplay = document.getElementById(timerDisplayId);
     let secondsLeft = OTP_RESEND_SECONDS;
+
+    if (!resendBtn || !timerDisplay) {
+        return;
+    }
 
     resendBtn.classList.add("hidden");
     timerDisplay.classList.remove("hidden");
-    updateTimerDisplay(secondsLeft);
+    updateTimerDisplay(timerDisplay, secondsLeft);
 
     clearInterval(countdownInterval);
     countdownInterval = setInterval(() => {
         secondsLeft -= 1;
-        updateTimerDisplay(secondsLeft);
+        updateTimerDisplay(timerDisplay, secondsLeft);
 
         if (secondsLeft <= 0) {
             clearInterval(countdownInterval);
@@ -161,7 +170,7 @@ function startResendTimer() {
     }, 1000);
 }
 
-async function handleResendCode() {
+async function handleResendSignupCode() {
     clearMessages();
 
     if (!pendingSignupEmail) {
@@ -173,7 +182,7 @@ async function handleResendCode() {
         await requestJson("/api/auth/signup/resend-code", { emailAddress: pendingSignupEmail });
         setMessage("verify-message", "A new code has been sent.");
         clearOtpInputs();
-        startResendTimer();
+        startResendTimer("signup-resend-btn", "signup-timer-display");
     } catch (error) {
         setMessage("verify-message", error.message, true);
     }
@@ -210,10 +219,67 @@ async function handleVerify() {
     }
 }
 
-function handleForgotPassword(event) {
+async function handleForgotCodeRequest() {
+    clearMessages();
+
+    const emailAddress = document.getElementById("forgot-email").value.trim().toLowerCase();
+    if (!emailAddress) {
+        setMessage("forgot-message", "Email is required to get a code.", true);
+        return;
+    }
+
+    try {
+        await requestJson("/api/auth/password/request-code", { emailAddress });
+        pendingForgotEmail = emailAddress;
+        setMessage("forgot-message", "A verification code has been sent to your email.");
+        startResendTimer("forgot-resend-btn", "forgot-timer-display");
+    } catch (error) {
+        setMessage("forgot-message", error.message, true);
+    }
+}
+
+async function handleForgotPassword(event) {
     event.preventDefault();
     clearMessages();
-    setMessage("forgot-message", "Reset flow is not connected yet.");
+
+    const emailAddress = document.getElementById("forgot-email").value.trim().toLowerCase();
+    const newPassword = document.getElementById("forgot-new-password").value;
+    const confirmPassword = document.getElementById("forgot-confirm-password").value;
+    const code = document.getElementById("forgot-code").value.trim();
+
+    if (!emailAddress || !newPassword || !confirmPassword || !code) {
+        setMessage("forgot-message", "All fields are required.", true);
+        return;
+    }
+
+    if (newPassword !== confirmPassword) {
+        setMessage("forgot-message", "Passwords do not match.", true);
+        return;
+    }
+
+    if (newPassword.length < 8) {
+        setMessage("forgot-message", "Password must be at least 8 characters long.", true);
+        return;
+    }
+
+    if (!/^\d{6}$/.test(code)) {
+        setMessage("forgot-message", "Verification code must be a 6-digit number.", true);
+        return;
+    }
+
+    try {
+        await requestJson("/api/auth/password/reset", {
+            emailAddress,
+            newPassword,
+            confirmPassword,
+            code,
+        });
+        pendingForgotEmail = "";
+        setMessage("forgot-message", "Password updated. You can log in now.");
+        toggleView("view-login");
+    } catch (error) {
+        setMessage("forgot-message", error.message, true);
+    }
 }
 
 function setupOtpInputBehavior() {
@@ -250,4 +316,5 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 window.handleVerify = handleVerify;
-window.handleResendCode = handleResendCode;
+window.handleResendSignupCode = handleResendSignupCode;
+window.handleForgotCodeRequest = handleForgotCodeRequest;

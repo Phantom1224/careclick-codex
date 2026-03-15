@@ -8,6 +8,8 @@ let messagePollId = null;
 let activeConversationId = null;
 let lastMessageCursor = null;
 const conversationCache = new Map();
+let allUsers = [];
+let searchTerm = "";
 
 if (!token) {
     window.location.href = "Login.html";
@@ -167,6 +169,11 @@ function renderUserDirectory(users = []) {
 
     listEl.innerHTML = "";
 
+    if (!searchTerm.trim()) {
+        emptyEl.classList.add("hidden");
+        return;
+    }
+
     if (!users.length) {
         emptyEl.classList.remove("hidden");
         return;
@@ -211,6 +218,28 @@ function renderUserDirectory(users = []) {
     });
 }
 
+function getFilteredUsers() {
+    const term = searchTerm.trim().toLowerCase();
+    if (!term) return [];
+    return allUsers.filter((user) => {
+        const name = (user.userName || "").toLowerCase();
+        const email = (user.emailAddress || "").toLowerCase();
+        return name.includes(term) || email.includes(term);
+    });
+}
+
+function setSearchMode(isSearch) {
+    const messagesList = document.getElementById("messages-list");
+    const messagesEmpty = document.getElementById("messages-empty");
+    const usersList = document.getElementById("users-list");
+    const usersEmpty = document.getElementById("users-empty");
+
+    if (messagesList) messagesList.classList.toggle("hidden", isSearch);
+    if (messagesEmpty) messagesEmpty.classList.toggle("hidden", isSearch);
+    if (usersList) usersList.classList.toggle("hidden", !isSearch);
+    if (usersEmpty) usersEmpty.classList.toggle("hidden", !isSearch);
+}
+
 async function loadConversations() {
     try {
         const data = await apiRequest("/api/messages/conversations");
@@ -223,15 +252,29 @@ async function loadConversations() {
 async function loadUserDirectory() {
     try {
         const data = await apiRequest("/api/users/location-feed");
-        const users = (data?.users || []).filter((user) => user._id !== currentUserId);
-        renderUserDirectory(users);
+        allUsers = (data?.users || []).filter((user) => user._id !== currentUserId);
+        renderUserDirectory(getFilteredUsers());
     } catch (error) {
         console.error("Failed to load users:", error.message);
     }
 }
 
+function findConversationByUserId(userId) {
+    for (const conversation of conversationCache.values()) {
+        if (conversation?.otherUser?._id === userId) {
+            return conversation;
+        }
+    }
+    return null;
+}
+
 async function startConversationWithUser(userId) {
     try {
+        const existing = findConversationByUserId(userId);
+        if (existing) {
+            openChatByConversationId(existing._id);
+            return;
+        }
         const data = await apiRequest(`/api/messages/conversations/with/${userId}`);
         const conversation = normalizeConversation(data?.conversation);
         if (!conversation) return;
@@ -378,7 +421,26 @@ function openMessages() {
     showElement("brand-header");
     stopMessagePolling();
     startConversationPolling();
+    setSearchMode(false);
     window.scrollTo(0, 0);
+}
+
+function toggleUserSearch() {
+    const row = document.getElementById("user-search-row");
+    const input = document.getElementById("user-search-input");
+    if (!row || !input) return;
+    const isHidden = row.classList.contains("hidden");
+    if (isHidden) {
+        row.classList.remove("hidden");
+        setSearchMode(true);
+        input.focus();
+        return;
+    }
+    row.classList.add("hidden");
+    input.value = "";
+    searchTerm = "";
+    setSearchMode(false);
+    renderUserDirectory(getFilteredUsers());
 }
 
 function openProfile() {
@@ -445,6 +507,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const sendBtn = document.getElementById("chat-send-btn");
     const input = document.getElementById("chat-input");
+    const userSearchInput = document.getElementById("user-search-input");
 
     if (sendBtn) {
         sendBtn.addEventListener("click", sendMessage);
@@ -458,4 +521,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    if (userSearchInput) {
+        userSearchInput.addEventListener("input", (event) => {
+            searchTerm = event.target.value || "";
+            renderUserDirectory(getFilteredUsers());
+        });
+    }
+
+    setSearchMode(false);
 });
