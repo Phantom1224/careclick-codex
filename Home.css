@@ -8,6 +8,7 @@
     --white: #ffffff;
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     --end-call-red: #ff4d5e;
+    --other-user-blink-ms: 500ms;
 }
 
 * {
@@ -26,6 +27,16 @@ body {
 }
 
 .hidden { display: none !important; }
+
+@keyframes otherUserBlink {
+    0% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+.other-user-marker {
+    animation: otherUserBlink var(--other-user-blink-ms) infinite;
+}
+
 
 /* MAP VIEW */
 #view-home {

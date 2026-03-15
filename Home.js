@@ -1,7 +1,8 @@
 const API_BASE = window.location.origin;
 const TOKEN_KEY = "careclickToken";
 const LOCATION_SYNC_MS = 5000;
-const USER_MARKER_ICON_URL = "Icon/gps.png";
+const USER_MARKER_ICON_URL = "Icon/gps-green.png";
+const OTHER_USER_MARKER_BLINK_MS = 500;
 const FEED_REFRESH_MS = LOCATION_SYNC_MS;
 
 const token = localStorage.getItem(TOKEN_KEY);
@@ -148,10 +149,11 @@ function createDefaultUserMarker(coords) {
 function createOtherUserMarker(coords) {
     return L.circleMarker(coords, {
         radius: 6,
-        color: "#15803d",
+        color: "#890c0c",
         weight: 2,
-        fillColor: "#22c55e",
-        fillOpacity: 0.85,
+        fillColor: "#f90909",
+        fillOpacity: 1,
+        className: "other-user-marker",
     }).addTo(map);
 }
 
@@ -162,7 +164,7 @@ async function createUserMarker(coords) {
         const userIcon = L.icon({
             iconUrl: USER_MARKER_ICON_URL,
             iconSize: [36, 36],
-            iconAnchor: [18, 36],
+            iconAnchor: [18, 34],
             popupAnchor: [0, -36],
         });
 
@@ -430,6 +432,10 @@ window.openSearch = openSearch;
 window.goHome = goHome;
 
 document.addEventListener("DOMContentLoaded", async () => {
+    document.documentElement.style.setProperty(
+        "--other-user-blink-ms",
+        `${OTHER_USER_MARKER_BLINK_MS}ms`
+    );
     initMap();
     await loadCurrentUser();
     startLocationTracking();
