@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const connectDB = require("./config/connectDB");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/users");
+const messageRoutes = require("./routes/messages");
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.get("/health", (_req, res) => {
 
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/messages", messageRoutes);
 
 app.get("/", (_req, res) => {
   res.sendFile(path.join(clientDir, "Login.html"));
