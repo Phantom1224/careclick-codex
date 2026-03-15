@@ -4,6 +4,7 @@ const LOCATION_SYNC_MS = 5000;
 const USER_MARKER_ICON_URL = "Icon/gps-green.png";
 const OTHER_USER_MARKER_BLINK_MS = 500;
 const FEED_REFRESH_MS = LOCATION_SYNC_MS;
+const PENDING_CHAT_USER_KEY = "careclickPendingChatUserId";
 
 const token = localStorage.getItem(TOKEN_KEY);
 let map = null;
@@ -19,6 +20,7 @@ let currentUserId = null;
 let feedRefreshTimerId = null;
 const otherUserMarkers = new Map();
 let isRequestingActive = false;
+let selectedUserForModal = null;
 
 if (!token) {
     window.location.href = "Login.html";
@@ -48,7 +50,7 @@ function clearSessionAndRedirect() {
         feedRefreshTimerId = null;
     }
 
-    otherUserMarkers.forEach((marker) => marker.remove());
+    otherUserMarkers.forEach((entry) => entry.marker.remove());
     otherUserMarkers.clear();
 
     localStorage.removeItem(TOKEN_KEY);
@@ -298,9 +300,9 @@ function syncOtherUserMarkers(users) {
 
     const activeIds = new Set(onlineOtherUsers.map((user) => String(user._id)));
 
-    otherUserMarkers.forEach((marker, userId) => {
+    otherUserMarkers.forEach((entry, userId) => {
         if (!activeIds.has(userId)) {
-            marker.remove();
+            entry.marker.remove();
             otherUserMarkers.delete(userId);
         }
     });
@@ -310,12 +312,14 @@ function syncOtherUserMarkers(users) {
         const coords = [user.userLocation.lat, user.userLocation.lng];
         const existing = otherUserMarkers.get(userId);
         if (existing) {
-            existing.setLatLng(coords);
+            existing.marker.setLatLng(coords);
+            existing.user = user;
             return;
         }
 
         const marker = createOtherUserMarker(coords);
-        otherUserMarkers.set(userId, marker);
+        marker.on("click", () => showIncomingUserModal(user));
+        otherUserMarkers.set(userId, { marker, user });
     });
 }
 
@@ -363,20 +367,30 @@ function cancelRequest() {
     resetHome();
 }
 
-function receiveIncomingRequest() {
+function showIncomingUserModal(user) {
+    selectedUserForModal = user || null;
+    const nameEl = document.getElementById("incoming-username");
+    if (nameEl) {
+        nameEl.textContent = user?.userName || "User";
+    }
     if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
     hideElement("sos-btn");
     showElement("incoming-modal");
 }
 
 function closeModal() {
+    selectedUserForModal = null;
     hideElement("incoming-modal");
     showElement("sos-btn");
 }
 
-function acceptHelp() {
-    alert("Help Accepted! Navigating to user...");
-    closeModal();
+function openChatFromModal() {
+    if (!selectedUserForModal?._id) {
+        closeModal();
+        return;
+    }
+    localStorage.setItem(PENDING_CHAT_USER_KEY, selectedUserForModal._id);
+    window.location.href = "Profile.html";
 }
 
 function resetHome() {
@@ -426,7 +440,7 @@ function goHome() {
 window.requestHelp = requestHelp;
 window.cancelRequest = cancelRequest;
 window.closeModal = closeModal;
-window.acceptHelp = acceptHelp;
+window.openChatFromModal = openChatFromModal;
 window.resetHome = resetHome;
 window.openSearch = openSearch;
 window.goHome = goHome;
@@ -448,7 +462,7 @@ window.addEventListener("beforeunload", () => {
         feedRefreshTimerId = null;
     }
 
-    otherUserMarkers.forEach((marker) => marker.remove());
+    otherUserMarkers.forEach((entry) => entry.marker.remove());
     otherUserMarkers.clear();
 
     if (locationWatchId !== null && navigator.geolocation) {

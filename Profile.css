@@ -9,6 +9,7 @@
     --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     --end-call-red: #ff7e82;
     --call-bg: #fcfdfe;
+    --brand-header-height: 60px;
 }
 
 * {
@@ -20,7 +21,7 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     background-color: var(--bg-light);
     margin: 0;
-    padding: 0;
+    padding: var(--brand-header-height) 0 0 0;
     color: var(--text-dark);
     display: flex;
     flex-direction: column;
@@ -33,6 +34,14 @@ body {
 .brand-header {
     background: var(--white);
     padding: 15px 20px 5px 20px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: var(--brand-header-height);
+    display: flex;
+    align-items: flex-end;
+    z-index: 30;
 }
 
 .logo { font-size: 1.4rem; font-weight: 800; margin: 0; }
@@ -47,7 +56,7 @@ header {
     align-items: center;
     position: sticky;
     top: 0;
-    z-index: 10;
+    z-index: 20;
 }
 
 .icon-btn { font-size: 1.2rem; cursor: pointer; background: none; border: none; padding: 5px; color: var(--text-dark); font-weight: bold; }
@@ -168,4 +177,28 @@ header {
 .view-profile {
     display: flex;
     align-items: center;
+}
+
+#view-chat {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: var(--brand-header-height);
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--bg-light);
+    overflow: hidden;
+}
+
+#view-chat header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+}
+
+#chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding-bottom: 120px;
 }

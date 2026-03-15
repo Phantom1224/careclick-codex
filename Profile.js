@@ -1,5 +1,6 @@
 const API_BASE = window.location.origin;
 const TOKEN_KEY = "careclickToken";
+const PENDING_CHAT_USER_KEY = "careclickPendingChatUserId";
 const token = localStorage.getItem(TOKEN_KEY);
 
 let currentUserId = null;
@@ -366,7 +367,7 @@ async function loadMessages({ reset } = {}) {
         if (messages.length) {
             messages.forEach(renderMessageBubble);
             lastMessageCursor = messages[messages.length - 1].createdAt;
-            scrollChatToBottom();
+            requestAnimationFrame(() => scrollChatToBottom());
         }
     } catch (error) {
         console.error("Failed to load messages:", error.message);
@@ -501,8 +502,8 @@ function showElement(id) {
     if (el) el.classList.remove("hidden");
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    loadProfile();
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadProfile();
     openProfile();
 
     const sendBtn = document.getElementById("chat-send-btn");
@@ -530,4 +531,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     setSearchMode(false);
+
+    const pendingUserId = localStorage.getItem(PENDING_CHAT_USER_KEY);
+    if (pendingUserId) {
+        localStorage.removeItem(PENDING_CHAT_USER_KEY);
+        openMessages();
+        startConversationWithUser(pendingUserId);
+    }
 });
