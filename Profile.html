@@ -51,27 +51,11 @@
 
         <main class="content-container">
             <h2 class="msg-section-title">Messages</h2>
-            <div class="message-row" onclick="openChat('User 2')">
-                <div class="msg-avatar avatar-lime">👤</div>
-                <div class="msg-body">
-                    <div class="msg-header">
-                        <span class="msg-name">User 2</span>
-                        <span class="msg-time">10:30 AM</span>
-                    </div>
-                    <p class="msg-text">Hey! How are you doing today?</p>
-                </div>
-            </div>
-
-            <!--<div class="message-row" onclick="openChat('Support Team')">
-                <div class="msg-avatar avatar-purple">👤</div>
-                <div class="msg-body">
-                    <div class="msg-header">
-                        <span class="msg-name">Support Team</span>
-                        <span class="msg-time">2 days ago</span>
-                    </div>
-                    <p class="msg-text">Thank you for contacting CareClick supp...</p>
-                </div>
-            </div>-->
+            <div id="messages-empty" class="msg-empty hidden">No conversations yet.</div>
+            <div id="messages-list"></div>
+            <h3 class="msg-section-subtitle">Start a new chat</h3>
+            <div id="users-empty" class="msg-empty hidden">No other users found.</div>
+            <div id="users-list"></div>
         </main>
     </div>
 
@@ -80,33 +64,14 @@
             <button class="icon-btn" onclick="openMessages()">←</button>
             <div style="text-align: center; flex: 1;">
                 <div class="page-title" id="chat-title">User Name</div>
-                <div class="active-status">Active now</div>
-            </div>
-            <div class="chat-header-actions">
-                <span onclick="startCall()" class="call-trigger">
-                    <img src="telephone-call_6204929.png" alt="Call" style="width: 20px; height: 20px;">
-                <span class="more-trigger">
-                     <img src="menu_18094589.png" alt="More" style="width: 20px; height: 20px;">
-                </span>
+                <div class="active-status" id="chat-status">Active now</div>
             </div>
         </header>
-        <main class="content-container chat-container">
-            <div class="chat-bubble bubble-received">
-                User 2 message
-                <span class="chat-meta">10:24 AM</span>
-            </div>
-            <div class="chat-bubble bubble-sent">
-                User 1 message
-                <span class="chat-meta">10:26 AM</span>
-            </div>
-        </main>
+        <main class="content-container chat-container" id="chat-messages"></main>
 
         <footer class="chat-footer">
-            <span class="footer-icon">
-                <img src="Icon/Add image.png" alt="Camera" style="width: 15px; height: 15px;">
-            </span>
-            <input type="text" class="chat-input" placeholder="Type a message...">
-            <button class="send-icon-btn">➤</button>
+            <input type="text" class="chat-input" id="chat-input" placeholder="Type a message...">
+            <button class="send-icon-btn" id="chat-send-btn">➤</button>
         </footer>
     </div>
 
